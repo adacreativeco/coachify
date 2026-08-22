@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { cn } from '../utils';
 import { toast } from 'sonner';
-import { Activity, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Shield, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -44,46 +43,50 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-black text-neutral-100 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Ambient background blur */}
+      <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-emerald-600/10 rounded-full blur-[140px] pointer-events-none" />
+
+      <div className="max-w-md w-full space-y-8 relative z-10">
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
-            <Activity className="h-8 w-8 text-white" />
-          </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Coachify'e Hoş Geldiniz
+          <Link to="/" className="inline-flex items-center space-x-2.5 mb-4 group">
+            <div className="w-10 h-10 bg-white/[0.04] border border-white/[0.08] rounded-xl flex items-center justify-center text-emerald-400 group-hover:border-emerald-500/40 transition-colors">
+              <Shield className="w-5 h-5" />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-white">COACHIFY<span className="text-emerald-400">.OS</span></span>
+          </Link>
+          <h2 className="text-2xl font-bold text-white tracking-tight">
+            Kulüp Portalına Giriş Yapın
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Takımınızı profesyonelce yönetmeye başlayın
+          <p className="mt-1 text-xs text-neutral-400">
+            Teknik heyet, başkan ve futbolcu yönetim paneline erişin
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/[0.08] rounded-2xl shadow-2xl p-8 space-y-6">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-xs font-medium text-neutral-300 mb-1">
                 E-posta Adresi
               </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="ornek@email.com"
-                />
-              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-3.5 py-2.5 bg-slate-950 border border-white/[0.08] rounded-xl text-white placeholder-neutral-500 text-xs focus:border-emerald-500 outline-none"
+                placeholder="ornek@kulup.com"
+              />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-xs font-medium text-neutral-300 mb-1">
                 Şifre
               </label>
-              <div className="mt-1 relative">
+              <div className="relative">
                 <input
                   id="password"
                   name="password"
@@ -92,40 +95,16 @@ export default function Login() {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-white/[0.08] rounded-xl text-white placeholder-neutral-500 text-xs focus:border-emerald-500 outline-none pr-10"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-neutral-500 hover:text-neutral-300"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Beni hatırla
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                  Şifremi unuttum?
-                </a>
               </div>
             </div>
 
@@ -133,56 +112,38 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={cn(
-                  'group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white',
-                  isLoading
-                    ? 'bg-blue-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-                )}
+                className="w-full py-2.5 px-4 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-semibold rounded-xl text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center space-x-1.5"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
-                    Giriş Yapılıyor...
+                    <Loader2 className="animate-spin h-4 w-4" />
+                    <span>Giriş Yapılıyor...</span>
                   </>
                 ) : (
-                  'Giriş Yap'
+                  <>
+                    <span>Giriş Yap</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </>
                 )}
               </button>
             </div>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Henüz hesabınız yok mu?</span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Link
-                to="/register"
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Hesap Oluştur
+          <div className="pt-4 border-t border-white/[0.06] text-center space-y-3">
+            <div className="text-xs text-neutral-400">
+              Henüz kulübünüz kayıtlı değil mi?{' '}
+              <Link to="/register" className="text-emerald-400 font-semibold hover:underline">
+                Hesap Oluşturun
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="text-center text-sm text-gray-500">
-          <p>
-            Demo için: 
-            <br />
-            <span className="font-medium">Teknik Direktör:</span> coach@demo.com / demo123
-            <br />
-            <span className="font-medium">Oyuncu:</span> player@demo.com / demo123
-            <br />
-            <span className="font-medium">Başkan:</span> president@demo.com / demo123
-          </p>
+        <div className="text-center text-xs text-neutral-500 bg-slate-900/50 p-4 rounded-xl border border-white/[0.04]">
+          <div className="font-semibold text-neutral-400 mb-1">Hızlı Demo Girişi:</div>
+          <div>coach@demo.com / demo123 (Teknik Direktör)</div>
+          <div>president@demo.com / demo123 (Kulüp Başkanı)</div>
+          <div>player@demo.com / demo123 (Futbolcu)</div>
         </div>
       </div>
     </div>

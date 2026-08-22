@@ -10,8 +10,7 @@ const routeLabels: Record<string, string> = {
   analytics: 'Performans Analitiği',
   messages: 'Mesajlar',
   settings: 'Ayarlar',
-  'case-studies': 'Vaka Çalışmaları',
-  'thank-you': 'Teşekkürler',
+  'thank-you': 'Kayıt Onayı',
 };
 
 export function Breadcrumbs() {

@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCoachifyStore, PlayerData } from '../stores/coachifyStore';
-import { Users, UserPlus, Search, Filter, Activity, TrendingUp, Edit, Trash2, X, Check, ShieldAlert } from 'lucide-react';
+import { Users, UserPlus, Search, Filter, Activity, TrendingUp, Edit, Trash2, X, Check, ShieldAlert, Sparkles, Heart, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Players() {
@@ -29,11 +30,11 @@ export default function Players() {
   });
 
   const positions = [
-    { value: 'all', label: 'Tüm Pozisyonlar' },
-    { value: 'goalkeeper', label: 'Kaleciler' },
-    { value: 'defender', label: 'Defanslar' },
-    { value: 'midfielder', label: 'Orta Sahalar' },
-    { value: 'forward', label: 'Forvetler' },
+    { value: 'all', label: 'Tüm Kadro' },
+    { value: 'forward', label: 'Forvetler (ST/LW/RW)' },
+    { value: 'midfielder', label: 'Orta Sahalar (CM/CAM/CDM)' },
+    { value: 'defender', label: 'Defanslar (CB/LB/RB)' },
+    { value: 'goalkeeper', label: 'Kaleciler (GK)' },
   ];
 
   const filteredPlayers = players.filter((p) => {
@@ -78,10 +79,14 @@ export default function Players() {
 
     if (editingPlayerId) {
       updatePlayer(editingPlayerId, formData);
-      toast.success(`${formData.name} başarıyla güncellendi.`);
+      toast.success(`${formData.name} başarıyla güncellendi.`, {
+        icon: <Check className="w-4 h-4 text-emerald-400" />,
+      });
     } else {
       addPlayer(formData);
-      toast.success(`${formData.name} kadroya eklendi.`);
+      toast.success(`${formData.name} kadroya eklendi.`, {
+        icon: <Check className="w-4 h-4 text-emerald-400" />,
+      });
     }
     setShowModal(false);
   };
@@ -100,263 +105,338 @@ export default function Players() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-wrap items-center justify-between gap-4">
+    <div className="space-y-8">
+      {/* 21st.dev Style Header with Action Button */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-slate-900/80 backdrop-blur-xl border border-white/10 flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Kadro & Oyuncu Yönetimi</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Toplam {players.length} lisanslı oyuncu • {players.filter((p) => p.status === 'injured').length} sakat • {players.filter((p) => p.status === 'fit').length} hazır
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold mb-2">
+            <Users className="w-3.5 h-3.5" />
+            <span>Futbolcu & Kadro Havuzu</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Kadro Yönetimi ({players.length} Oyuncu)
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Oyuncu OVR puanları, piyasa değerleri, kondisyon durumları ve maç istatistikleri.
           </p>
         </div>
-        <button
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={handleOpenAddModal}
-          className="inline-flex items-center px-4 py-2.5 rounded-lg shadow-sm text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors"
+          className="px-5 py-3 rounded-2xl font-black text-xs text-black bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 hover:from-emerald-300 hover:to-teal-200 shadow-lg shadow-emerald-500/25 flex items-center space-x-2 transition-all"
         >
-          <UserPlus className="w-4 h-4 mr-2" />
-          Yeni Oyuncu Ekle
-        </button>
+          <UserPlus className="w-4 h-4" />
+          <span>Yeni Oyuncu Ekle</span>
+        </motion.button>
       </div>
 
-      {/* Filter Toolbar */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[240px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Oyuncu adı veya forma no..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500 text-gray-900 dark:text-white"
-            />
-          </div>
-
-          <select
-            value={selectedPosition}
-            onChange={(e) => setSelectedPosition(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white font-medium"
-          >
-            {positions.map((pos) => (
-              <option key={pos.value} value={pos.value}>
-                {pos.label}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white font-medium"
-          >
-            <option value="all">Tüm Durumlar</option>
-            <option value="fit">✅ Hazır (Fit)</option>
-            <option value="injured">🩹 Sakat</option>
-            <option value="suspended">🟥 Cezalı</option>
-            <option value="resting">⏱️ Dinlendiriliyor</option>
-          </select>
+      {/* Filter & Search Bar */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/60 backdrop-blur-md border border-white/10 flex flex-wrap items-center justify-between gap-4">
+        {/* Search Input */}
+        <div className="relative flex-1 min-w-[240px]">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="İsim veya forma numarası ile ara..."
+            className="w-full pl-10 pr-4 py-2.5 bg-slate-950/80 border border-white/10 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
         </div>
 
-        <div className="text-xs font-bold text-gray-500">
-          Gösterilen: <span className="text-emerald-600">{filteredPlayers.length}</span> / {players.length}
-        </div>
-      </div>
-
-      {/* Players Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-        {filteredPlayers.map((player) => {
-          const isInjured = player.status === 'injured';
-          return (
-            <div
-              key={player.id}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow group flex flex-col justify-between"
+        {/* Position Filter Tabs with layoutId */}
+        <div className="flex flex-wrap gap-1.5 p-1 bg-slate-950/80 rounded-xl border border-white/10">
+          {positions.map((pos) => (
+            <button
+              key={pos.value}
+              onClick={() => setSelectedPosition(pos.value)}
+              className={`relative px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                selectedPosition === pos.value ? 'text-white' : 'text-slate-400 hover:text-white'
+              }`}
             >
-              <div className="p-5">
-                {/* Top Badge Row */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-black text-sm flex items-center justify-center border border-emerald-300 dark:border-emerald-800">
-                    #{player.jerseyNumber}
-                  </span>
-                  <div className="flex items-center space-x-1.5">
-                    <span className="px-2 py-0.5 rounded-full text-[11px] font-black bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                      {player.rating} OVR
+              {selectedPosition === pos.value && (
+                <motion.div
+                  layoutId="activePlayerTab"
+                  className="absolute inset-0 rounded-lg bg-emerald-600 shadow-md border border-emerald-400/30"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">{pos.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 21st.dev Style EA FC / FUT Holographic Player Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <AnimatePresence>
+          {filteredPlayers.map((player) => {
+            const isInjured = player.status === 'injured';
+            const isSuspended = player.status === 'suspended';
+
+            return (
+              <motion.div
+                key={player.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                transition={{ duration: 0.25 }}
+                className="group relative rounded-3xl p-6 bg-gradient-to-b from-slate-900/90 via-slate-900/70 to-slate-950/90 border border-white/10 hover:border-emerald-500/40 shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 backdrop-blur-xl flex flex-col justify-between overflow-hidden"
+              >
+                {/* Holographic metallic shine on hover */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+                <div>
+                  {/* Top Bar: Jersey & Rating */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-black flex items-center justify-center font-black text-base shadow-lg shadow-emerald-500/20">
+                        #{player.jerseyNumber}
+                      </div>
+                      <div>
+                        <div className="text-xl font-black text-white group-hover:text-emerald-300 transition-colors">
+                          {player.name}
+                        </div>
+                        <div className="text-xs font-bold text-slate-400">
+                          {player.positionDetail} • {player.age} Yaş
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500 font-mono">
+                        {player.rating}
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">OVR</span>
+                    </div>
+                  </div>
+
+                  {/* Status Badges */}
+                  <div className="flex items-center gap-2 mb-4">
+                    {isInjured ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
+                        <ShieldAlert className="w-3 h-3" /> Sakat
+                      </span>
+                    ) : isSuspended ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                        Cezalı
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Hazır & Sağlıklı
+                      </span>
+                    )}
+
+                    <span className="text-[11px] font-mono font-bold text-slate-300 px-2 py-0.5 rounded bg-white/5 border border-white/10">
+                      {formatCurrency(player.marketValue)}
                     </span>
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        isInjured
-                          ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
-                          : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                      }`}
-                    >
-                      {isInjured ? 'Sakat' : 'Hazır'}
-                    </span>
+                  </div>
+
+                  {/* Stat Metrics Grid */}
+                  <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-slate-950/70 border border-white/5 mb-4 text-center">
+                    <div>
+                      <div className="text-xs text-slate-400 font-semibold">Gol</div>
+                      <div className="text-sm font-black text-white">{player.goals}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-400 font-semibold">Asist</div>
+                      <div className="text-sm font-black text-white">{player.assists}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-slate-400 font-semibold">Maç</div>
+                      <div className="text-sm font-black text-white">{player.matchesPlayed}</div>
+                    </div>
+                  </div>
+
+                  {/* Fitness Bar */}
+                  <div className="space-y-1 mb-2">
+                    <div className="flex justify-between text-[11px] font-semibold text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-3 h-3 text-rose-400" /> Kondisyon
+                      </span>
+                      <span className="font-mono text-emerald-400 font-bold">%{player.fitness}</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-white/5">
+                      <div
+                        className={`h-full transition-all ${
+                          player.fitness >= 80 ? 'bg-emerald-500' : player.fitness >= 50 ? 'bg-amber-500' : 'bg-rose-500'
+                        }`}
+                        style={{ width: `${player.fitness}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* Player Name & Detail */}
-                <h3 className="font-bold text-gray-900 dark:text-white text-base truncate">{player.name}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{player.positionDetail} • {player.age} Yaş</p>
-
-                {/* Key Metrics */}
-                <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-gray-100 dark:border-gray-700/60 text-center text-xs">
-                  <div className="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
-                    <div className="text-[10px] text-gray-400 font-semibold">Gol / Asist</div>
-                    <div className="font-bold text-gray-800 dark:text-gray-200 mt-0.5">{player.goals} / {player.assists}</div>
-                  </div>
-                  <div className="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
-                    <div className="text-[10px] text-gray-400 font-semibold">Maç / Dk</div>
-                    <div className="font-bold text-gray-800 dark:text-gray-200 mt-0.5">{player.matchesPlayed} ({player.minutesPlayed}')</div>
-                  </div>
-                  <div className="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
-                    <div className="text-[10px] text-gray-400 font-semibold">Değer</div>
-                    <div className="font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">{formatCurrency(player.marketValue)}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Bar */}
-              <div className="px-5 py-3 bg-gray-50 dark:bg-gray-700/40 border-t border-gray-100 dark:border-gray-700/60 flex items-center justify-between text-xs">
-                <span className="text-gray-400">Kondisyon: <strong className="text-gray-700 dark:text-gray-300">%{player.fitness}</strong></span>
-                <div className="flex items-center space-x-2">
+                {/* Card Actions */}
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between">
                   <button
                     onClick={() => handleOpenEditModal(player)}
-                    className="p-1.5 rounded text-gray-500 hover:text-emerald-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    className="p-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition-colors text-xs font-bold flex items-center space-x-1.5"
                   >
                     <Edit className="w-3.5 h-3.5" />
+                    <span>Düzenle</span>
                   </button>
+
                   <button
                     onClick={() => handleDelete(player.id, player.name)}
-                    className="p-1.5 rounded text-gray-500 hover:text-red-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    className="p-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition-colors"
+                    title="Kadro dışı bırak"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
-      {/* Add / Edit Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-700">
-              <h3 className="font-bold text-lg text-gray-900 dark:text-white">
-                {editingPlayerId ? 'Oyuncu Profilini Düzenle' : 'Yeni Oyuncu Kaydı'}
-              </h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {/* Add / Edit Modal with Framer Motion AnimatePresence */}
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowModal(false)}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+            />
 
-            <form onSubmit={handleSavePlayer} className="space-y-4 mt-4 text-sm">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Ad Soyad</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Forma No</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="99"
-                    value={formData.jerseyNumber}
-                    onChange={(e) => setFormData({ ...formData, jerseyNumber: parseInt(e.target.value) || 1 })}
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Yaş</label>
-                  <input
-                    type="number"
-                    value={formData.age}
-                    onChange={(e) => setFormData({ ...formData, age: parseInt(e.target.value) || 20 })}
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Mevki Grubu</label>
-                  <select
-                    value={formData.position}
-                    onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white"
-                  >
-                    <option value="goalkeeper">Kaleci</option>
-                    <option value="defender">Defans</option>
-                    <option value="midfielder">Orta Saha</option>
-                    <option value="forward">Forvet</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Pozisyon Detayı</label>
-                  <input
-                    type="text"
-                    value={formData.positionDetail}
-                    onChange={(e) => setFormData({ ...formData, positionDetail: e.target.value })}
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white"
-                    placeholder="Örn: Sol Bek"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">OVR Rating (1-99)</label>
-                  <input
-                    type="number"
-                    min="50"
-                    max="99"
-                    value={formData.rating}
-                    onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) || 75 })}
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Sağlık Durumu</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white"
-                  >
-                    <option value="fit">Hazır</option>
-                    <option value="injured">Sakat</option>
-                    <option value="suspended">Cezalı</option>
-                    <option value="resting">Dinlendiriliyor</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg p-6 sm:p-8 rounded-3xl bg-slate-900 border border-white/15 shadow-2xl z-10 space-y-6"
+            >
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <h3 className="text-lg font-black text-white">
+                  {editingPlayerId ? 'Oyuncu Profilini Güncelle' : 'Yeni Futbolcu Ekle'}
+                </h3>
                 <button
-                  type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg"
+                  className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/5"
                 >
-                  İptal
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow"
-                >
-                  {editingPlayerId ? 'Güncelle' : 'Kaydet'}
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </form>
+
+              <form onSubmit={handleSavePlayer} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1.5">İsim & Soyisim</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1.5">Forma No</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="99"
+                      required
+                      value={formData.jerseyNumber}
+                      onChange={(e) => setFormData({ ...formData, jerseyNumber: parseInt(e.target.value) || 1 })}
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1.5">Pozisyon Grubu</label>
+                    <select
+                      value={formData.position}
+                      onChange={(e) => setFormData({ ...formData, position: e.target.value as any })}
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <option value="forward">Forvet</option>
+                      <option value="midfielder">Orta Saha</option>
+                      <option value="defender">Defans</option>
+                      <option value="goalkeeper">Kaleci</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1.5">Mevki Detayı</label>
+                    <input
+                      type="text"
+                      value={formData.positionDetail}
+                      onChange={(e) => setFormData({ ...formData, positionDetail: e.target.value })}
+                      placeholder="Örn: Santrafor, Stoper"
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1.5">OVR Puanı (50-99)</label>
+                    <input
+                      type="number"
+                      min="50"
+                      max="99"
+                      value={formData.rating}
+                      onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) || 75 })}
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-white/10 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1.5">Yaş</label>
+                    <input
+                      type="number"
+                      min="15"
+                      max="45"
+                      value={formData.age}
+                      onChange={(e) => setFormData({ ...formData, age: parseInt(e.target.value) || 22 })}
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-300 block mb-1.5">Kondisyon (%)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={formData.fitness}
+                      onChange={(e) => setFormData({ ...formData, fitness: parseInt(e.target.value) || 100 })}
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-white/10 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-white/10 flex items-center justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-bold transition-colors"
+                  >
+                    Vazgeç
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-black text-xs font-black shadow-lg shadow-emerald-500/25 transition-all"
+                  >
+                    {editingPlayerId ? 'Kaydet & Güncelle' : 'Kadroya Ekle'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }

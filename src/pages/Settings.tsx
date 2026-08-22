@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useCoachifyStore } from '../stores/coachifyStore';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Settings as SettingsIcon, Building, User, Shield, Save, CheckCircle2, RotateCcw, Trash2, AlertTriangle } from 'lucide-react';
+import { Settings as SettingsIcon, Building2, User, Shield, Save, CheckCircle2, RotateCcw, Trash2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SettingsPage() {
@@ -15,7 +15,7 @@ export default function SettingsPage() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     updateClubInfo(formData);
-    toast.success('Kulüp ve sistem ayarları başarıyla kaydedildi!');
+    toast.success('Kulüp ve sistem ayarları başarıyla kaydedildi.');
   };
 
   const handleReset = () => {
@@ -34,10 +34,14 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 dark:text-white">Kulüp & Sistem Ayarları</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-2">
+            <SettingsIcon className="w-3.5 h-3.5" />
+            <span>Sistem & Yapılandırma</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Kulüp & Sistem Ayarları</h1>
+          <p className="text-neutral-400 text-xs sm:text-sm mt-1">
             Kulüp kimliği, stadyum, lig bilgileri, gizlilik ve veri yönetimi.
           </p>
         </div>
@@ -45,127 +49,132 @@ export default function SettingsPage() {
         <div className="flex items-center space-x-2">
           <button
             onClick={handleReset}
-            className="inline-flex items-center px-4 py-2 rounded-lg text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 border border-gray-300 transition-colors"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-neutral-300 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-colors"
           >
-            <RotateCcw className="w-3.5 h-3.5 mr-1.5" /> Kadroyu Sıfırla
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Kadroyu Sıfırla</span>
           </button>
           <button
             onClick={() => setShowDeleteModal(true)}
-            className="inline-flex items-center px-4 py-2 rounded-lg text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 transition-colors"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-colors"
           >
-            <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Hesabımı Sil
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Hesabımı Sil</span>
           </button>
         </div>
       </div>
 
       {/* Form Card */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <form onSubmit={handleSave} className="space-y-6 max-w-2xl">
+      <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-6 shadow-xl">
+        <form onSubmit={handleSave} className="space-y-6 max-w-2xl text-xs">
           <div className="space-y-4">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center">
-              <Building className="w-4 h-4 mr-2 text-emerald-600" /> Kulüp Kimlik Bilgileri
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-emerald-400" />
+              <span>Kulüp Kimlik Bilgileri</span>
             </h3>
 
             <div>
-              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kulüp / Akademi Adı</label>
+              <label className="block text-neutral-300 font-medium mb-1">Kulüp / Akademi Adı</label>
               <input
                 type="text"
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm"
+                className="w-full px-3 py-2 bg-slate-950 border border-white/[0.08] rounded-xl text-white focus:border-emerald-500 outline-none"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Lig / Organizasyon</label>
+                <label className="block text-neutral-300 font-medium mb-1">Lig / Organizasyon</label>
                 <input
                   type="text"
                   value={formData.league}
                   onChange={(e) => setFormData({ ...formData, league: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm"
+                  className="w-full px-3 py-2 bg-slate-950 border border-white/[0.08] rounded-xl text-white focus:border-emerald-500 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Stadyum / Tesis</label>
+                <label className="block text-neutral-300 font-medium mb-1">Stadyum / Tesis</label>
                 <input
                   type="text"
                   value={formData.stadium}
                   onChange={(e) => setFormData({ ...formData, stadium: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm"
+                  className="w-full px-3 py-2 bg-slate-950 border border-white/[0.08] rounded-xl text-white focus:border-emerald-500 outline-none"
                 />
               </div>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-gray-100 dark:border-gray-700 space-y-4">
-            <h3 className="text-base font-bold text-gray-900 dark:text-white flex items-center">
-              <User className="w-4 h-4 mr-2 text-blue-600" /> Yetkili & Teknik Heyet
+          <div className="pt-5 border-t border-white/[0.06] space-y-4">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <User className="w-4 h-4 text-blue-400" />
+              <span>Yetkili & Teknik Heyet</span>
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Teknik Direktör</label>
+                <label className="block text-neutral-300 font-medium mb-1">Teknik Direktör</label>
                 <input
                   type="text"
                   value={formData.coachName}
                   onChange={(e) => setFormData({ ...formData, coachName: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm"
+                  className="w-full px-3 py-2 bg-slate-950 border border-white/[0.08] rounded-xl text-white focus:border-emerald-500 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Kulüp Başkanı</label>
+                <label className="block text-neutral-300 font-medium mb-1">Kulüp Başkanı</label>
                 <input
                   type="text"
                   value={formData.presidentName}
                   onChange={(e) => setFormData({ ...formData, presidentName: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white text-sm"
+                  className="w-full px-3 py-2 bg-slate-950 border border-white/[0.08] rounded-xl text-white focus:border-emerald-500 outline-none"
                 />
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end pt-3">
             <button
               type="submit"
-              className="inline-flex items-center px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm"
+              className="inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl text-xs font-bold text-slate-950 bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20"
             >
-              <Save className="w-4 h-4 mr-2" /> Değişiklikleri Kaydet
+              <Save className="w-3.5 h-3.5" />
+              <span>Değişiklikleri Kaydet</span>
             </button>
           </div>
         </form>
       </div>
 
-      {/* Delete Account Modal (KVKK/GDPR) */}
+      {/* Delete Account Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-red-500/40 space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center">
-              <AlertTriangle className="w-6 h-6" />
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-rose-500/30 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5" />
             </div>
 
             <div className="space-y-1">
-              <h3 className="font-bold text-lg text-gray-900 dark:text-white">Hesabınızı Silmek İstediğinize Emin Misiniz?</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+              <h3 className="font-bold text-base text-white">Hesabınızı Silmek İstiyor Musunuz?</h3>
+              <p className="text-xs text-neutral-400 leading-relaxed">
                 Bu işlem geri alınamaz. KVKK ve GDPR kapsamında tüm kişisel verileriniz, oturumunuz ve yerel kayıtlarınız kalıcı olarak silinecektir.
               </p>
             </div>
 
-            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex justify-end space-x-2.5 pt-3 border-t border-white/[0.08]">
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                className="px-4 py-2 text-xs font-medium text-neutral-400 hover:text-white"
               >
                 Vazgeç
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDeleteAccount}
-                className="px-5 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg shadow"
+                className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 rounded-xl shadow"
               >
                 Evet, Kalıcı Olarak Sil
               </button>

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useCoachifyStore } from '../stores/coachifyStore';
-import { MessageSquare, Send, Plus, Search, Users, Mail, CheckCircle2 } from 'lucide-react';
+import { MessageSquare, Send, Plus, Search, Users, Mail, CheckCircle2, Megaphone, Inbox, SendHorizontal, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Messages() {
@@ -37,75 +37,86 @@ export default function Messages() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 dark:text-white">Takım İçi Mesajlaşma & Duyurular</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-2">
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Takım İletişim Hattı</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Takım İçi Mesajlaşma & Duyurular</h1>
+          <p className="text-neutral-400 text-xs sm:text-sm mt-1">
             Teknik heyet, yönetim ve oyuncular arası anlık koordinasyon ve duyuru kanalı.
           </p>
         </div>
         <button
           onClick={() => setShowCompose(!showCompose)}
-          className="inline-flex items-center px-4 py-2.5 rounded-lg text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm"
+          className="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-slate-950 bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 transition-all"
         >
-          <Plus className="w-4 h-4 mr-2" />
-          {showCompose ? 'Kapat' : 'Yeni Mesaj Yaz'}
+          <Plus className="w-4 h-4" />
+          <span>{showCompose ? 'Kapat' : 'Yeni Mesaj Yaz'}</span>
         </button>
       </div>
 
       {/* Compose Form */}
       {showCompose && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-emerald-500/30 p-6 space-y-4 animate-in fade-in duration-200">
-          <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center">
-            <Send className="w-4 h-4 mr-2 text-emerald-600" /> Mesaj Oluştur
-          </h3>
+        <div className="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-6 space-y-4 backdrop-blur-xl shadow-2xl animate-in fade-in duration-200">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-sm text-white flex items-center gap-2">
+              <Send className="w-4 h-4 text-emerald-400" />
+              <span>Mesaj Oluştur</span>
+            </h3>
+            <button onClick={() => setShowCompose(false)} className="text-neutral-500 hover:text-white">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
-          <form onSubmit={handleSendMessage} className="space-y-4 text-sm">
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSendMessage} className="space-y-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Alıcı Kanalı</label>
+                <label className="block text-neutral-300 font-medium mb-1">Alıcı Kanalı</label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 bg-slate-950 border border-white/[0.08] rounded-xl text-white focus:border-emerald-500 outline-none"
                 >
-                  <option value="team">📢 Tüm Takım (Genel Duyuru)</option>
-                  <option value="inbox">📩 Teknik Heyet</option>
-                  <option value="sent">💼 Kulüp Yönetimi</option>
+                  <option value="team">Tüm Takım (Genel Duyuru)</option>
+                  <option value="inbox">Teknik Heyet</option>
+                  <option value="sent">Kulüp Yönetimi</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Konu Başlığı</label>
+                <label className="block text-neutral-300 font-medium mb-1">Konu Başlığı</label>
                 <input
                   type="text"
                   required
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   placeholder="Örn: Hafta Sonu Maç Saati Değişikliği"
-                  className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 bg-slate-950 border border-white/[0.08] rounded-xl text-white focus:border-emerald-500 outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Mesaj Metni</label>
+              <label className="block text-neutral-300 font-medium mb-1">Mesaj Metni</label>
               <textarea
                 rows={3}
                 required
                 value={formData.content}
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="Mesajınızı buraya yazın..."
-                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white resize-none"
+                className="w-full px-3 py-2 bg-slate-950 border border-white/[0.08] rounded-xl text-white focus:border-emerald-500 outline-none resize-none"
               />
             </div>
 
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end space-x-2.5">
               <button
                 type="submit"
-                className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow flex items-center"
+                className="px-5 py-2 text-xs font-bold text-slate-950 bg-emerald-500 hover:bg-emerald-400 rounded-xl shadow flex items-center space-x-1.5"
               >
-                <Send className="w-3.5 h-3.5 mr-1.5" /> Gönder
+                <Send className="w-3.5 h-3.5" />
+                <span>Gönder</span>
               </button>
             </div>
           </form>
@@ -113,42 +124,47 @@ export default function Messages() {
       )}
 
       {/* Messages List */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-4">
-        <div className="flex space-x-2 border-b border-gray-200 dark:border-gray-700 pb-3">
+      <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/[0.08] rounded-2xl p-6 space-y-4 shadow-xl">
+        <div className="flex flex-wrap gap-2 border-b border-white/[0.06] pb-3">
           {[
-            { id: 'all', label: 'Tümü' },
-            { id: 'team', label: '📢 Takım Duyuruları' },
-            { id: 'inbox', label: '📩 Gelenler' },
-            { id: 'sent', label: '📤 Gönderilenler' },
-          ].map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id as any)}
-              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
-                selectedCategory === cat.id
-                  ? 'bg-emerald-600 text-white'
-                  : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+            { id: 'all', label: 'Tümü', icon: Mail },
+            { id: 'team', label: 'Takım Duyuruları', icon: Megaphone },
+            { id: 'inbox', label: 'Gelenler', icon: Inbox },
+            { id: 'sent', label: 'Gönderilenler', icon: SendHorizontal },
+          ].map((cat) => {
+            const Icon = cat.icon;
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id as any)}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center space-x-1.5 ${
+                  isSelected
+                    ? 'bg-emerald-500 text-slate-950'
+                    : 'bg-white/[0.04] text-neutral-400 hover:text-white border border-white/[0.06]'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
         </div>
 
-        <div className="divide-y divide-gray-100 dark:divide-gray-700">
+        <div className="divide-y divide-white/[0.06]">
           {filteredMessages.map((msg) => (
             <div key={msg.id} className="py-4 space-y-1.5">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center space-x-2">
-                  <span className="font-bold text-gray-900 dark:text-white text-sm">{msg.sender}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 font-semibold text-gray-600 dark:text-gray-300">
+                  <span className="font-bold text-white text-sm">{msg.sender}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-neutral-400">
                     {msg.recipient}
                   </span>
                 </div>
-                <span className="text-gray-400 font-semibold text-[11px]">{msg.timestamp}</span>
+                <span className="text-neutral-500 font-mono text-[11px]">{msg.timestamp}</span>
               </div>
-              <div className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{msg.subject}</div>
-              <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{msg.content}</p>
+              <div className="text-sm font-semibold text-emerald-400">{msg.subject}</div>
+              <p className="text-xs text-neutral-300 leading-relaxed">{msg.content}</p>
             </div>
           ))}
         </div>
