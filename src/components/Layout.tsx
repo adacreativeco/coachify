@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore, useUIStore, useNotificationStore } from '../stores';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '../types';
+import { Breadcrumbs } from './Breadcrumbs';
 import {
   Home,
   Users,
@@ -45,7 +46,7 @@ export function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex font-sans">
       {/* Mobile Sidebar Backdrop */}
       {sidebarOpen && (
         <div
@@ -188,8 +189,11 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </header>
 
-        {/* Page Container */}
-        <main className="p-6 flex-1 max-w-7xl w-full mx-auto">{children}</main>
+        {/* Page Container with Breadcrumbs */}
+        <main className="p-6 flex-1 max-w-7xl w-full mx-auto">
+          <Breadcrumbs />
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -15,6 +15,9 @@ import Matches from '@/pages/Matches';
 import Analytics from '@/pages/Analytics';
 import Messages from '@/pages/Messages';
 import Settings from '@/pages/Settings';
+import CaseStudies from '@/pages/CaseStudies';
+import ThankYou from '@/pages/ThankYou';
+import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,9 +35,11 @@ export default function App() {
         <Router>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Routes>
-              {/* Public Landing Page */}
+              {/* Public Pages */}
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
+              <Route path="/case-studies" element={<CaseStudies />} />
+              <Route path="/thank-you" element={<ThankYou />} />
 
               {/* Public Auth Routes */}
               <Route path="/login" element={<Login />} />
@@ -105,8 +110,8 @@ export default function App() {
                 </ProtectedRoute>
               } />
 
-              {/* Fallback route */}
-              <Route path="*" element={<Navigate to="/" replace />} />
+              {/* 404 Not Found */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
             
             <Toaster 
