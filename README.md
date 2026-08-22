@@ -12,13 +12,18 @@
 [![Vite](https://img.shields.io/badge/Vite-6.2-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Vitest](https://img.shields.io/badge/Vitest-Tested-green.svg?logo=vitest&logoColor=white)](https://vitest.dev/)
+[![CI Pipeline](https://github.com/adacreativeco/coachify/actions/workflows/ci.yml/badge.svg)](https://github.com/adacreativeco/coachify/actions)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 **COACHIFY.OS** is a high-performance, AI-assisted Football Club & Sports Academy Operating System. It unifies **interactive tactic boards, real-time training roll-calls, match timeline recording, multi-role portals (Club President, Head Coach, Player), and financial analytics** in a unified reactive architecture.
 
+<p align="center">
+  <img src="docs/assets/coachify_landing.png" alt="Coachify OS Landing Page" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);" />
+</p>
+
 ---
 
-## 🌟 Core Pillars & Capabilities
+## 🌟 Core Pillars & Architecture
 
 ```mermaid
 graph TD
@@ -35,21 +40,44 @@ graph TD
 ```
 
 ### 1. ⚽ Interactive Pitch & Tactic Board
-- Visual grass pitch with standard tactical formations (`4-3-3`, `4-4-2`, `4-2-3-1`, `3-5-2`).
-- Real-time squad lineup assignment, tactical mentality selectors, captain and set-piece takers.
+- Visual grass pitch supporting multiple standard tactical formations (`4-3-3`, `4-4-2`, `4-2-3-1`, `3-5-2`).
+- Real-time squad lineup assignment, tactical mentality selectors, captain, penalty, and free-kick assignments.
+
+<p align="center">
+  <img src="docs/assets/coachify_tactic_board.png" alt="Coachify OS Tactical Pitch" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);" />
+</p>
 
 ### 2. 📋 Training Planner & Live Roll Call
-- Schedule drills focused on Tactics, Conditioning, Shooting, Passing, or Goalkeeping.
-- 1-click squad roll call tracker with 4 status states (*Katıldı, İzinli, Sakat, Gelmedi*).
+- Schedule drills focused on **Tactics, Conditioning, Shooting, Passing, or Goalkeeping**.
+- 1-click squad roll call tracker with 4 status states (*Katıldı / Present, İzinli / Excused, Sakat / Injured, Gelmedi / Absent*).
 
-### 3. 👑 Multi-Role Unified Portals
-- **President**: Total squad valuation (€), income/expense ledger, transfer budgets.
-- **Head Coach**: Next match tactical readiness, squad fitness average, injury radar.
-- **Player**: Individual match rating, goals/assists, fitness radar, coach feedback.
+<p align="center">
+  <img src="docs/assets/coachify_training.png" alt="Coachify Training Roll Call" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);" />
+</p>
 
-### 4. 📊 Performance Analytics & AI Advisor
+### 3. 👥 Squad & Player Management
+- 22-player rich roster with OVR ratings, injury tracking, market values, and instant player creation/editing.
+
+<p align="center">
+  <img src="docs/assets/coachify_players.png" alt="Coachify Players Management" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);" />
+</p>
+
+### 4. 👑 Multi-Role Unified Portals
+- **👑 President**: Total squad valuation (€), income/expense ledger, transfer budgets, sponsorship agreements.
+- **📋 Head Coach**: Next match tactical readiness, squad fitness average (%88), weekly sessions, and injury radar.
+- **⚽ Player**: Individual match rating, goals/assists, fitness radar, attendance score, and coach feedback.
+
+<p align="center">
+  <img src="docs/assets/coachify_dashboard.png" alt="Coachify Coach Dashboard" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);" />
+</p>
+
+### 5. 📊 Performance Analytics & AI Advisor
 - Radar charts for squad balance (Offense, Defense, Physical, Passing, Pace, Discipline).
-- Automated AI Tactical Advisor generating scouting insights and substitution suggestions.
+- Automated AI Tactical Advisor generating scouting insights and substitution suggestions for upcoming derby fixtures.
+
+<p align="center">
+  <img src="docs/assets/coachify_analytics.png" alt="Coachify Analytics" width="100%" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3);" />
+</p>
 
 ---
 
@@ -66,7 +94,7 @@ npm install
 # Run development server
 npm run dev
 
-# Run automated Vitest test suite
+# Run automated Vitest test suite (8/8 tests passing)
 npm test
 
 # Build production bundle
@@ -76,4 +104,4 @@ npm run build
 ---
 
 ## 📄 License
-Licensed under the Apache License 2.0. Developed by [ADA Creative Co.](https://github.com/adacreativeco).
+Licensed under the Apache License 2.0. Developed with 🧠 by [ADA Creative Co.](https://github.com/adacreativeco).
