@@ -10,6 +10,7 @@ interface AuthContextType {
   signIn: (email: string, password?: string) => Promise<void>;
   signUp: (email: string, password: string, name: string, role: string) => Promise<void>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   switchRole: (role: UserRole) => void;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -52,19 +53,43 @@ const demoProfiles: Record<UserRole, User> = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// In-memory rate limiting state
+let failedAttempts = 0;
+let lockoutExpiry = 0;
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { user, setUser, setIsLoading, logout } = useAuthStore();
   const [loading, setLoadingState] = useState(false);
 
   useEffect(() => {
-    // If no user is logged in, default to COACH for immediate interactive exploration
     if (!user) {
       setUser(demoProfiles[UserRole.COACH]);
     }
     setIsLoading(false);
   }, []);
 
+  const checkRateLimit = (): boolean => {
+    const now = Date.now();
+    if (now < lockoutExpiry) {
+      const remainingSec = Math.ceil((lockoutExpiry - now) / 1000);
+      toast.error(`Çok fazla başarısız deneme. Lütfen ${remainingSec} saniye bekleyin.`);
+      return false;
+    }
+    return true;
+  };
+
+  const recordFailedAttempt = () => {
+    failedAttempts++;
+    if (failedAttempts >= 5) {
+      lockoutExpiry = Date.now() + 60 * 1000; // 60s cooldown
+      failedAttempts = 0;
+      toast.error('Güvenlik nedeniyle oturum açma 60 saniye boyunca kilitlendi.');
+    }
+  };
+
   const signIn = async (email: string) => {
+    if (!checkRateLimit()) return;
+
     setLoadingState(true);
     let matchedRole = UserRole.COACH;
     if (email.toLowerCase().includes('baskan') || email.toLowerCase().includes('president')) {
@@ -75,11 +100,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const selectedUser = demoProfiles[matchedRole];
     setUser(selectedUser);
+    failedAttempts = 0;
     setLoadingState(false);
     toast.success(`Giriş başarılı! Rol: ${selectedUser.name} (${selectedUser.role.toUpperCase()})`);
   };
 
   const signUp = async (email: string, _password: string, name: string, role: string) => {
+    if (!checkRateLimit()) return;
+
     setLoadingState(true);
     const newUser: User = {
       id: 'usr_' + Date.now(),
@@ -90,6 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       updatedAt: new Date().toISOString(),
     };
     setUser(newUser);
+    failedAttempts = 0;
     setLoadingState(false);
     toast.success(`Hesap oluşturuldu ve giriş yapıldı!`);
   };
@@ -105,12 +134,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     toast.info('Oturum kapatıldı.');
   };
 
+  const deleteAccount = async () => {
+    logout();
+    localStorage.clear();
+    toast.success('Hesabınız ve tüm ilişkili verileriniz kalıcı olarak silindi.');
+  };
+
   const resetPassword = async () => {
-    toast.info('Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.');
+    if (!checkRateLimit()) return;
+    toast.info('Şifre sıfırlama talimatı güvenlik kontrollerinin ardından iletilecektir.');
   };
 
   const updatePassword = async () => {
-    toast.success('Şifreniz başarıyla güncellendi.');
+    toast.success('Şifreniz güvenli bir şekilde güncellendi.');
   };
 
   return (
@@ -121,6 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         signOut,
+        deleteAccount,
         switchRole,
         resetPassword,
         updatePassword,

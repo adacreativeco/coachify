@@ -112,6 +112,9 @@ export default function Home() {
           {/* Nav Links */}
           <div className="hidden md:flex items-center space-x-6 text-xs font-bold text-slate-300">
             <a href="#features" className="hover:text-emerald-400 transition-colors">Özellikler</a>
+            <Link to="/guide" className="text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1 font-extrabold">
+              ✨ Web Rehberi
+            </Link>
             <Link to="/case-studies" className="hover:text-emerald-400 transition-colors">Vaka Analizleri</Link>
             <a href="#testimonials" className="hover:text-emerald-400 transition-colors">Kulüp Yorumları</a>
             <a href="#faq" className="hover:text-emerald-400 transition-colors">SSS</a>

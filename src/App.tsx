@@ -17,6 +17,7 @@ import Messages from '@/pages/Messages';
 import Settings from '@/pages/Settings';
 import CaseStudies from '@/pages/CaseStudies';
 import ThankYou from '@/pages/ThankYou';
+import Guide from '@/pages/Guide';
 import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient({
@@ -38,6 +39,9 @@ export default function App() {
               {/* Public Pages */}
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
+              <Route path="/guide" element={<Guide />} />
+              <Route path="/rehber" element={<Guide />} />
+              <Route path="/showcase" element={<Guide />} />
               <Route path="/case-studies" element={<CaseStudies />} />
               <Route path="/thank-you" element={<ThankYou />} />
 
