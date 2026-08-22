@@ -28,7 +28,7 @@ export default function Login() {
     try {
       await signIn(formData.email, formData.password);
       toast.success('Başarıyla giriş yapıldı!');
-      navigate('/');
+      navigate('/dashboard');
     } catch (error: any) {
       toast.error(error.message || 'Giriş yapılırken bir hata oluştu');
     } finally {
