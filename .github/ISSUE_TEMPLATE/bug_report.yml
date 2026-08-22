@@ -1,0 +1,37 @@
+name: 🐛 Hata Bildirimi (Bug Report)
+description: Coachify OS içerisinde karşılaştığınız bir hatayı bildirin.
+title: "[BUG] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Hata bildirimi yaptığınız için teşekkürler! Lütfen sorunu en kısa sürede çözebilmemiz için detayları doldurun.
+  - type: input
+    id: version
+    attributes:
+      label: Coachify Sürümü
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Ne Oldu?
+      description: Karşılaştığınız hatayı detaylandırın.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Hatayı Tekrarlama Adımları
+      description: 1. '/matches' sayfasına gidin, 2. 'Diziliş' seçin vb.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Beklenen Davranış
+      description: Sistemin normalde nasıl çalışması gerekiyordu?
+    validations:
+      required: true

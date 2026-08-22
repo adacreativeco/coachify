@@ -1,0 +1,21 @@
+{
+  "name": "COACHIFY.OS — Futbol Kulübü & Akademi Yönetimi",
+  "short_name": "COACHIFY",
+  "description": "Yapay zeka destekli profesyonel futbol kulübü ve akademi işletim sistemi.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/og-image.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/og-image.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

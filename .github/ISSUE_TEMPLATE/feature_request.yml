@@ -1,0 +1,19 @@
+name: 💡 Yeni Özellik Talebi (Feature Request)
+description: Coachify OS için yeni bir modül, taktik veya özellik önerin.
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Çözülmek İstenen Problem / İhtiyaç
+      description: Bu özellik kulüp veya teknik heyet için hangi sorunu çözecek?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Önerilen Çözüm / Tasarım
+      description: Bu özelliğin nasıl çalışmasını hayal ediyorsunuz?
+    validations:
+      required: true
