@@ -6,7 +6,7 @@ export interface PlayerData {
   name: string;
   jerseyNumber: number;
   position: 'goalkeeper' | 'defender' | 'midfielder' | 'forward';
-  positionDetail: string; // e.g. 'Stoper', 'Sol Bek', 'Merkez Orta Saha', 'Santrafor'
+  positionDetail: string;
   rating: number; // 1-100
   age: number;
   status: 'fit' | 'injured' | 'suspended' | 'resting';
@@ -16,13 +16,11 @@ export interface PlayerData {
   matchesPlayed: number;
   minutesPlayed: number;
   fitness: number; // 0-100
-  avatar?: string;
 }
 
 export interface MatchData {
   id: string;
   opponent: string;
-  opponentLogo?: string;
   date: string;
   time: string;
   venue: string;
@@ -44,7 +42,7 @@ export interface TrainingSessionData {
   location: string;
   coach: string;
   status: 'scheduled' | 'completed';
-  attendance: Record<string, 'present' | 'excused' | 'injured' | 'absent'>; // playerId -> status
+  attendance: Record<string, 'present' | 'excused' | 'injured' | 'absent'>;
 }
 
 export interface MessageData {
@@ -71,7 +69,7 @@ export interface FinancialEntry {
 
 export interface TacticState {
   formation: '4-3-3' | '4-4-2' | '4-2-3-1' | '3-5-2';
-  lineup: Record<string, string>; // positionKey (e.g. 'gk', 'cb1', 'cb2', 'lb', 'rb') -> playerId
+  lineup: Record<string, string>;
   captainId: string;
   penaltyTakerId: string;
   freeKickTakerId: string;
@@ -79,7 +77,17 @@ export interface TacticState {
   mentality: 'ultra_defensive' | 'defensive' | 'balanced' | 'attacking' | 'very_attacking';
 }
 
+export interface ClubInfo {
+  name: string;
+  league: string;
+  stadium: string;
+  coachName: string;
+  presidentName: string;
+  primaryColor: string;
+}
+
 interface CoachifyState {
+  clubInfo: ClubInfo;
   players: PlayerData[];
   matches: MatchData[];
   trainings: TrainingSessionData[];
@@ -87,34 +95,32 @@ interface CoachifyState {
   financials: FinancialEntry[];
   tactic: TacticState;
   
-  // Actions - Players
+  // Actions
+  updateClubInfo: (updates: Partial<ClubInfo>) => void;
   addPlayer: (player: Omit<PlayerData, 'id'>) => void;
   updatePlayer: (id: string, updates: Partial<PlayerData>) => void;
   deletePlayer: (id: string) => void;
-
-  // Actions - Matches
   addMatch: (match: Omit<MatchData, 'id'>) => void;
   updateMatchScore: (id: string, homeScore: number, awayScore: number, events?: MatchData['events']) => void;
-
-  // Actions - Trainings & Attendance
   addTraining: (training: Omit<TrainingSessionData, 'id' | 'attendance'>) => void;
   setPlayerAttendance: (trainingId: string, playerId: string, status: 'present' | 'excused' | 'injured' | 'absent') => void;
-
-  // Actions - Messages
   sendMessage: (msg: Omit<MessageData, 'id' | 'timestamp' | 'isRead'>) => void;
-
-  // Actions - Financials
   addFinancialEntry: (entry: Omit<FinancialEntry, 'id'>) => void;
-
-  // Actions - Tactics
   setFormation: (formation: TacticState['formation']) => void;
   assignPlayerToPosition: (positionKey: string, playerId: string) => void;
   setTacticalRole: (role: 'captainId' | 'penaltyTakerId' | 'freeKickTakerId' | 'cornerTakerId', playerId: string) => void;
   setMentality: (mentality: TacticState['mentality']) => void;
-
-  // Reset to default sample squad
   resetToDefaults: () => void;
 }
+
+const initialClubInfo: ClubInfo = {
+  name: 'Galatasaray Spor Kulübü',
+  league: 'Süper Lig / UEFA Avrupa Ligi',
+  stadium: 'Ali Sami Yen Spor Kompleksi RAMS Park',
+  coachName: 'Okan Buruk',
+  presidentName: 'Dursun Özbek',
+  primaryColor: '#e11d48',
+};
 
 const initialPlayers: PlayerData[] = [
   { id: 'p1', name: 'Fernando Muslera', jerseyNumber: 1, position: 'goalkeeper', positionDetail: 'Kaleci (Kaptan)', rating: 86, age: 38, status: 'fit', marketValue: 1200000, goals: 0, assists: 0, matchesPlayed: 14, minutesPlayed: 1260, fitness: 92 },
@@ -285,17 +291,17 @@ const initialFinancials: FinancialEntry[] = [
 const initialTactic: TacticState = {
   formation: '4-3-3',
   lineup: {
-    gk: 'p1', // Muslera
-    lb: 'p6', // Jakobs
-    cb1: 'p4', // Sanchez
-    cb2: 'p3', // Nelsson
-    rb: 'p5', // Kaan
-    dm: 'p9', // Torreira
-    cm1: 'p10', // Sara
-    cm2: 'p11', // Mertens
-    lw: 'p16', // Sallai
-    rw: 'p15', // Baris Alper
-    st: 'p18', // Osimhen
+    gk: 'p1',
+    lb: 'p6',
+    cb1: 'p4',
+    cb2: 'p3',
+    rb: 'p5',
+    dm: 'p9',
+    cm1: 'p10',
+    cm2: 'p11',
+    lw: 'p16',
+    rw: 'p15',
+    st: 'p18',
   },
   captainId: 'p1',
   penaltyTakerId: 'p18',
@@ -307,12 +313,18 @@ const initialTactic: TacticState = {
 export const useCoachifyStore = create<CoachifyState>()(
   persist(
     (set) => ({
+      clubInfo: initialClubInfo,
       players: initialPlayers,
       matches: initialMatches,
       trainings: initialTrainings,
       messages: initialMessages,
       financials: initialFinancials,
       tactic: initialTactic,
+
+      updateClubInfo: (updates) =>
+        set((state) => ({
+          clubInfo: { ...state.clubInfo, ...updates },
+        })),
 
       addPlayer: (newPlayer) =>
         set((state) => ({
@@ -398,6 +410,7 @@ export const useCoachifyStore = create<CoachifyState>()(
 
       resetToDefaults: () =>
         set({
+          clubInfo: initialClubInfo,
           players: initialPlayers,
           matches: initialMatches,
           trainings: initialTrainings,

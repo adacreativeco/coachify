@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useCoachifyStore } from '../stores/coachifyStore';
-import { BarChart3, TrendingUp, Activity, Award, Sparkles, Shield, Zap } from 'lucide-react';
+import { BarChart3, TrendingUp, Activity, Award, Sparkles, Shield, Zap, RefreshCw } from 'lucide-react';
 import {
   ResponsiveContainer,
   RadarChart,
@@ -14,37 +14,59 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  LineChart,
-  Line,
 } from 'recharts';
+import { toast } from 'sonner';
 
 export default function Analytics() {
-  const { players, matches, tactic } = useCoachifyStore();
+  const { players, matches, tactic, clubInfo } = useCoachifyStore();
   const [analyzing, setAnalyzing] = useState(false);
   const [aiReport, setAiReport] = useState<string | null>(null);
 
-  // Radar chart data for squad balance
+  // Dynamic calculations from actual store state
+  const forwards = players.filter((p) => p.position === 'forward');
+  const defenders = players.filter((p) => p.position === 'defender');
+  const midfielders = players.filter((p) => p.position === 'midfielder');
+  const goalkeepers = players.filter((p) => p.position === 'goalkeeper');
+
+  const forwardRating = forwards.length > 0 ? Math.round(forwards.reduce((a, b) => a + b.rating, 0) / forwards.length) : 70;
+  const defenseRating = defenders.length > 0 ? Math.round(defenders.reduce((a, b) => a + b.rating, 0) / defenders.length) : 70;
+  const midfieldRating = midfielders.length > 0 ? Math.round(midfielders.reduce((a, b) => a + b.rating, 0) / midfielders.length) : 70;
+  const gkRating = goalkeepers.length > 0 ? Math.round(goalkeepers.reduce((a, b) => a + b.rating, 0) / goalkeepers.length) : 70;
+  const avgFitness = players.length > 0 ? Math.round(players.reduce((a, b) => a + b.fitness, 0) / players.length) : 80;
+  const avgRating = players.length > 0 ? Math.round(players.reduce((a, b) => a + b.rating, 0) / players.length) : 75;
+
   const squadRadarData = [
-    { subject: 'Hücum Gücü', A: 88, fullMark: 100 },
-    { subject: 'Savunma Disiplini', A: 84, fullMark: 100 },
-    { subject: 'Fizik & Pres', A: 92, fullMark: 100 },
-    { subject: 'Pas & Yaratıcılık', A: 86, fullMark: 100 },
-    { subject: 'Hız & Kontra', A: 89, fullMark: 100 },
-    { subject: 'Duran Top', A: 82, fullMark: 100 },
+    { subject: `Hücum (${forwardRating})`, A: forwardRating, fullMark: 100 },
+    { subject: `Savunma (${defenseRating})`, A: defenseRating, fullMark: 100 },
+    { subject: `Orta Saha (${midfieldRating})`, A: midfieldRating, fullMark: 100 },
+    { subject: `Kaleci (${gkRating})`, A: gkRating, fullMark: 100 },
+    { subject: `Kondisyon (%${avgFitness})`, A: avgFitness, fullMark: 100 },
+    { subject: `Genel Güç (${avgRating})`, A: avgRating, fullMark: 100 },
   ];
 
-  // Top Scorers
-  const topScorers = [...players].sort((a, b) => b.goals - a.goals).slice(0, 5);
+  // Top Scorers sorted dynamically
+  const topScorers = [...players].sort((a, b) => (b.goals + b.assists) - (a.goals + a.assists)).slice(0, 6);
+
+  const nextMatch = matches.find((m) => m.status === 'scheduled');
+  const injuredList = players.filter((p) => p.status === 'injured');
+  const topScorer = topScorers[0];
 
   const handleGenerateAiReport = () => {
     setAnalyzing(true);
     setTimeout(() => {
-      setAiReport(`🤖 Coachify AI Taktiksel Danışman Raporu:
-• Mevcut Diziliş Analizi (${tactic.formation}): Hücum kanat organizasyonunda Barış Alper ve Sallai yüksek verimlilik sağlıyor.
-• Rakip Savunma Açığı: Fenerbahçe U21 maçında stoperler arasındaki 22 metrelik boşluk, Osimhen'in derin koşuları için kilit fırsat alanı.
-• Kondisyon Uyarısı: İkinci yarıda Torreira ve Sara'nın pres yoğunluğu %18 düşüyor; Batshuayi ve Berkan değişiklikleri 65. dakikada planlanmalı.`);
+      const opponentName = nextMatch ? nextMatch.opponent : 'Sıradaki Rakip';
+      const injuredNames = injuredList.length > 0 ? injuredList.map((p) => p.name).join(', ') : 'Bulunmuyor (Tam Kadro)';
+      
+      const report = `🤖 ${clubInfo.name} — Canlı Yapay Zeka Taktiksel Teşhis Raporu:
+• 📈 Formasyon Verimliliği (${tactic.formation}): Kadronuzun hücum gücü (${forwardRating} OVR), ${topScorer?.name ? topScorer.name + ' liderliğinde' : ''} lig ortalamasının %14 üzerinde üretkenlik sağlıyor.
+• 🩹 Sakatlık Durumu ve Kadro Derinliği: Tedavisi süren oyuncular: ${injuredNames}. Mevki rotasyonunda ${midfielders.length} orta saha oyuncusu ile derinlik korunuyor.
+• 🎯 ${opponentName} Maçı Taktik Tavsiyesi: Rakip presini kırmak için ${tactic.mentality === 'attacking' ? 'Hızlı Kanat Akınları ve Yüksek Pres' : 'Dengeli Geçiş Hücumları'} stratejisi en yüksek galibiyet olasılığını vermektedir.
+• ⚡ Kondisyon İkazı: Takım genel kondisyonu %${avgFitness}. İkinci yarıda 65-70. dakikalar arasında 3 oyuncu değişikliği tavsiye edilir.`;
+
+      setAiReport(report);
       setAnalyzing(false);
-    }, 1200);
+      toast.success('Yapay zeka analizi başarıyla tamamlandı!');
+    }, 1000);
   };
 
   return (
@@ -52,9 +74,9 @@ export default function Analytics() {
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-gray-900 dark:text-white">Performans & Taktik Analitiği</h1>
+          <h1 className="text-2xl font-black text-gray-900 dark:text-white">Performans & Taktiksel Analitik</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Gelişmiş metrikler, takım denge radarı, oyuncu skor katkıları ve AI taktik önerileri.
+            Kadronuzdaki {players.length} oyuncunun anlık istatistiklerinden hesaplanan dinamik denge ve yapay zeka analizleri.
           </p>
         </div>
 
@@ -64,15 +86,20 @@ export default function Analytics() {
           className="inline-flex items-center px-4 py-2.5 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 shadow-md transition-all"
         >
           <Sparkles className="w-4 h-4 mr-2" />
-          {analyzing ? 'Yapay Zeka Analiz Ediyor...' : 'AI Taktik Raporu Üret'}
+          {analyzing ? 'Yapay Zeka Hesaplanıyor...' : 'Canlı AI Taktik Raporu Al'}
         </button>
       </div>
 
-      {/* AI Tactical Advice Banner */}
+      {/* AI Tactical Advice Box */}
       {aiReport && (
         <div className="bg-slate-900 border border-emerald-500/40 rounded-2xl p-6 text-white shadow-xl animate-in fade-in duration-300">
-          <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs mb-2">
-            <Zap className="w-4 h-4" /> <span>CANLI YAPAY ZEKA DERBİ TAVSİYESİ</span>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-2 text-emerald-400 font-bold text-xs">
+              <Zap className="w-4 h-4" /> <span>CANLI YAPAY ZEKA TAKTİKSEL KARAR RAPORU</span>
+            </div>
+            <button onClick={() => setAiReport(null)} className="text-xs text-gray-400 hover:text-white">
+              Kapat
+            </button>
           </div>
           <pre className="font-sans text-sm text-slate-200 whitespace-pre-line leading-relaxed">
             {aiReport}
@@ -80,13 +107,43 @@ export default function Analytics() {
         </div>
       )}
 
+      {/* Dynamic Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-xs font-bold text-gray-400">Hücum Gücü (Ort)</div>
+          <div className="text-2xl font-black text-emerald-600 mt-1">{forwardRating} OVR</div>
+          <div className="text-[10px] text-gray-400">{forwards.length} Forvet Oyuncusu</div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-xs font-bold text-gray-400">Savunma Gücü (Ort)</div>
+          <div className="text-2xl font-black text-blue-600 mt-1">{defenseRating} OVR</div>
+          <div className="text-[10px] text-gray-400">{defenders.length} Defans Oyuncusu</div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-xs font-bold text-gray-400">Orta Saha Gücü (Ort)</div>
+          <div className="text-2xl font-black text-purple-600 mt-1">{midfieldRating} OVR</div>
+          <div className="text-[10px] text-gray-400">{midfielders.length} Orta Saha</div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center">
+          <div className="text-xs font-bold text-gray-400">Kondisyon Ortalaması</div>
+          <div className="text-2xl font-black text-amber-500 mt-1">%{avgFitness}</div>
+          <div className="text-[10px] text-emerald-600 font-bold">Maça Hazır</div>
+        </div>
+      </div>
+
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Squad Balance Radar Chart */}
+        {/* Dynamic Squad Radar */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
-          <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center">
-            <Shield className="w-4 h-4 mr-2 text-emerald-600" /> Takım Denge Radarı
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center">
+              <Shield className="w-4 h-4 mr-2 text-emerald-600" /> Dinamik Takım Denge Radarı
+            </h3>
+            <span className="text-xs text-gray-400 font-semibold">{clubInfo.name}</span>
+          </div>
 
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -94,17 +151,20 @@ export default function Analytics() {
                 <PolarGrid stroke="#e5e7eb" />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#6b7280', fontSize: 11 }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#9ca3af" />
-                <Radar name="Galatasaray" dataKey="A" stroke="#10b981" fill="#10b981" fillOpacity={0.4} />
+                <Radar name={clubInfo.name} dataKey="A" stroke="#10b981" fill="#10b981" fillOpacity={0.4} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Top Scorers Bar Chart */}
+        {/* Dynamic Top Scorers */}
         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
-          <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center">
-            <Award className="w-4 h-4 mr-2 text-amber-500" /> En Çok Gol Katkısı Verenler
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center">
+              <Award className="w-4 h-4 mr-2 text-amber-500" /> Gol ve Asist Liderleri
+            </h3>
+            <span className="text-xs text-gray-400 font-semibold">Skor Katkısı</span>
+          </div>
 
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
